@@ -1,6 +1,6 @@
 ![Preview](https://raw.githubusercontent.com/olixis/pi-openrouter-plus/main/assets/preview.png)
 
-# pi-openrouter-realtime v0.3.5
+# pi-openrouter-realtime v0.3.6
 
 Pi extension for OpenRouter that loads the latest models from OpenRouter in real time, with provider/quantization enrichment, endpoint health indicators, credit balance display, interactive model picker, and tab-completion.
 
@@ -9,6 +9,11 @@ Once the extension is installed and your OpenRouter credential is configured in 
 Npm package:
 
 - `pi-openrouter-realtime`
+
+## What's New in v0.3.6
+
+- **Fixed scoped models on startup** — the live OpenRouter catalog is now registered during extension load, before Pi resolves saved scoped-model patterns
+- **Fixes disappearing new models** — models that are not yet in Pi's built-in OpenRouter list, such as `perceptron/perceptron-mk1`, remain available in scoped models after closing and reopening Pi
 
 ## What's New in v0.3.5
 

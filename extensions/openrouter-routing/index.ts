@@ -100,7 +100,7 @@ function buildVariantPricingInfo(target: { pricing?: { prompt?: string; completi
   return buildPricingParts(input, output, cacheRead, cacheWrite).join(" · ");
 }
 
-export default function openrouterModelsExtension(pi: ExtensionAPI) {
+export default async function openrouterModelsExtension(pi: ExtensionAPI) {
   // ---------- Keep extension info messages out of LLM context ----------
 
   pi.on("context", async (event) => {
@@ -132,6 +132,28 @@ export default function openrouterModelsExtension(pi: ExtensionAPI) {
   }
 
   // ---------- Core sync logic ----------
+
+  async function bootstrapPlainSync() {
+    const generation = nextGeneration();
+
+    try {
+      // Register the live OpenRouter catalog during extension load so Pi can
+      // resolve saved scoped-model patterns before session_start fires.
+      // The models endpoint is public, and session_start refreshes again with
+      // the configured API key when one is available.
+      const result = await buildPlainSync(process.env.OPENROUTER_API_KEY, true);
+
+      if (isStale(generation)) return;
+      commitSnapshot(generation, result.models, result.routes);
+      registerWithSnapshot(result.models, result.routes);
+    } catch {
+      // Keep startup resilient. If OpenRouter is temporarily unavailable, Pi's
+      // built-in OpenRouter list remains registered and manual /openrouter-sync
+      // can recover later.
+    }
+  }
+
+  await bootstrapPlainSync();
 
   async function syncPlain(ctx: any, silent = false, force = false) {
     const generation = nextGeneration();
