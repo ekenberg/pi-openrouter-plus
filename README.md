@@ -1,6 +1,6 @@
 ![Preview](https://raw.githubusercontent.com/olixis/pi-openrouter-plus/main/assets/preview.png)
 
-# pi-openrouter-realtime v0.3.4
+# pi-openrouter-realtime v0.3.5
 
 Pi extension for OpenRouter that loads the latest models from OpenRouter in real time, with provider/quantization enrichment, endpoint health indicators, credit balance display, interactive model picker, and tab-completion.
 
@@ -9,6 +9,12 @@ Once the extension is installed and your OpenRouter credential is configured in 
 Npm package:
 
 - `pi-openrouter-realtime`
+
+## What's New in v0.3.5
+
+- **Fixed reasoning-level availability** — OpenRouter models are now marked as reasoning-capable when the live API advertises `reasoning`, `include_reasoning`, or `reasoning_effort` in `supported_parameters`
+- **Fixed enriched variant reasoning** — provider/quantization variants now preserve endpoint reasoning support so Pi's thinking-level selector stays available
+- **Updated Pi package imports** — moved extension imports and package metadata from the old `@mariozechner/*` package names to `@earendil-works/*`
 
 ## What's New in v0.3.4
 

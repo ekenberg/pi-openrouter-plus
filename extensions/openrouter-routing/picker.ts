@@ -1,5 +1,5 @@
-import { visibleWidth, fuzzyFilter, matchesKey, decodeKittyPrintable } from "@mariozechner/pi-tui";
-import type { Component, Focusable } from "@mariozechner/pi-tui";
+import { visibleWidth, fuzzyFilter, matchesKey, decodeKittyPrintable } from "@earendil-works/pi-tui";
+import type { Component, Focusable } from "@earendil-works/pi-tui";
 import type { OpenRouterModel } from "./types.js";
 
 const VIEWPORT_ROWS = 10;

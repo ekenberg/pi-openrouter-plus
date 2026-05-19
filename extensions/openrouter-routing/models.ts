@@ -29,13 +29,44 @@ const REASONING_ID_PATTERNS = [
 
 const REASONING_NAME_PATTERNS = ["thinking", "reasoner", "chain-of-thought"];
 
-export function isReasoningModel(m: OpenRouterModel): boolean {
-  const id = m.id.toLowerCase();
-  const name = (m.name || "").toLowerCase();
+const REASONING_SUPPORTED_PARAMETERS = new Set([
+  "include_reasoning",
+  "reasoning",
+  "reasoning_effort",
+]);
+
+function supportsReasoningParameter(supportedParameters?: string[]): boolean {
+  return supportedParameters?.some((p) => REASONING_SUPPORTED_PARAMETERS.has(p)) ?? false;
+}
+
+function hasReasoningDefaults(defaultParameters?: Record<string, unknown>): boolean {
   return (
-    REASONING_ID_PATTERNS.some((p) => id.includes(p)) ||
-    REASONING_NAME_PATTERNS.some((p) => name.includes(p))
+    defaultParameters?.include_reasoning !== undefined ||
+    defaultParameters?.reasoning !== undefined ||
+    defaultParameters?.reasoning_effort !== undefined
   );
+}
+
+function matchesReasoningNameHeuristic(id: string, name?: string): boolean {
+  const normalizedId = id.toLowerCase();
+  const normalizedName = (name || "").toLowerCase();
+  return (
+    REASONING_ID_PATTERNS.some((p) => normalizedId.includes(p)) ||
+    REASONING_NAME_PATTERNS.some((p) => normalizedName.includes(p))
+  );
+}
+
+export function isReasoningModel(m: OpenRouterModel): boolean {
+  return (
+    supportsReasoningParameter(m.supported_parameters) ||
+    hasReasoningDefaults(m.default_parameters) ||
+    matchesReasoningNameHeuristic(m.id, m.name)
+  );
+}
+
+function isReasoningEndpoint(endpoint: OpenRouterEndpoint): boolean | undefined {
+  if (!endpoint.supported_parameters) return undefined;
+  return supportsReasoningParameter(endpoint.supported_parameters);
 }
 
 // ---------- Input modality ----------
@@ -185,11 +216,15 @@ function buildVariantModel(
   endpoints: OpenRouterEndpoint[],
 ): ProviderModelConfig {
   const fallback = toProviderModel(base);
+  const endpointReasoning = endpoints
+    .map(isReasoningEndpoint)
+    .filter((value): value is boolean => value !== undefined);
 
   return {
     id: route.syntheticId,
     name: createVariantName(fallback.name, route.providerName, route.quantization),
-    reasoning: fallback.reasoning,
+    reasoning: endpointReasoning.length > 0 ? endpointReasoning.some(Boolean) : fallback.reasoning,
+    thinkingLevelMap: fallback.thinkingLevelMap,
     input: fallback.input,
     cost: {
       input: maxDefined(

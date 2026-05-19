@@ -1,5 +1,7 @@
 export type InputType = "text" | "image";
 export type SyncMode = "plain" | "enriched";
+export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
+export type ThinkingLevelMap = Partial<Record<ThinkingLevel, string | null>>;
 
 // ---------- OpenRouter API response types ----------
 
@@ -92,6 +94,7 @@ export interface ProviderModelConfig {
   id: string;
   name: string;
   reasoning: boolean;
+  thinkingLevelMap?: ThinkingLevelMap;
   input: InputType[];
   cost: {
     input: number;

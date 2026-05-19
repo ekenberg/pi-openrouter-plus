@@ -5,7 +5,7 @@ import {
   type Context,
   type Model,
   type SimpleStreamOptions,
-} from "@mariozechner/pi-ai";
+} from "@earendil-works/pi-ai";
 import { ENRICHED_MODEL_PREFIX, type RouteVariant } from "./types.js";
 
 export function createStreamFactory(routes: ReadonlyMap<string, RouteVariant>) {
