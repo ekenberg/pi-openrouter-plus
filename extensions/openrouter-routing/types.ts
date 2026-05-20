@@ -1,3 +1,5 @@
+import type { Api, Model } from "@earendil-works/pi-ai";
+
 export type InputType = "text" | "image";
 export type SyncMode = "plain" | "enriched";
 export type ThinkingLevel = "off" | "minimal" | "low" | "medium" | "high" | "xhigh";
@@ -93,6 +95,8 @@ export interface OpenRouterCreditsInfo {
 export interface ProviderModelConfig {
   id: string;
   name: string;
+  api?: Api;
+  baseUrl?: string;
   reasoning: boolean;
   thinkingLevelMap?: ThinkingLevelMap;
   input: InputType[];
@@ -104,6 +108,8 @@ export interface ProviderModelConfig {
   };
   contextWindow: number;
   maxTokens: number;
+  headers?: Record<string, string>;
+  compat?: Model<Api>["compat"];
 }
 
 export interface RouteVariant {

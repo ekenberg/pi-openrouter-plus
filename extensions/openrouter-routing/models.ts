@@ -1,3 +1,4 @@
+import { getModels } from "@earendil-works/pi-ai";
 import {
   ENRICHED_MODEL_PREFIX,
   ENDPOINT_STATUS_LABELS,
@@ -104,8 +105,45 @@ function minPositive(values: Array<number | undefined>, fallback: number): numbe
 
 // ---------- Model conversion ----------
 
+const BUILTIN_OPENROUTER_MODELS = new Map(getModels("openrouter").map((model) => [model.id, model]));
+
+function applyBuiltinOpenRouterMetadata(model: ProviderModelConfig): ProviderModelConfig {
+  const builtin = BUILTIN_OPENROUTER_MODELS.get(model.id);
+  if (!builtin) return model;
+
+  const merged: ProviderModelConfig = {
+    ...model,
+    api: model.api ?? builtin.api,
+    baseUrl: model.baseUrl ?? builtin.baseUrl,
+    reasoning: model.reasoning || builtin.reasoning,
+  };
+
+  if (builtin.thinkingLevelMap || model.thinkingLevelMap) {
+    merged.thinkingLevelMap = {
+      ...(builtin.thinkingLevelMap ?? {}),
+      ...(model.thinkingLevelMap ?? {}),
+    };
+  }
+
+  if (builtin.headers || model.headers) {
+    merged.headers = {
+      ...(builtin.headers ?? {}),
+      ...(model.headers ?? {}),
+    };
+  }
+
+  if (builtin.compat || model.compat) {
+    merged.compat = {
+      ...((builtin.compat ?? {}) as Record<string, unknown>),
+      ...((model.compat ?? {}) as Record<string, unknown>),
+    } as ProviderModelConfig["compat"];
+  }
+
+  return merged;
+}
+
 export function toProviderModel(m: OpenRouterModel): ProviderModelConfig {
-  return {
+  return applyBuiltinOpenRouterMetadata({
     id: m.id,
     name: m.name || m.id,
     reasoning: isReasoningModel(m),
@@ -118,7 +156,7 @@ export function toProviderModel(m: OpenRouterModel): ProviderModelConfig {
     },
     contextWindow: m.context_length || 128000,
     maxTokens: m.top_provider?.max_completion_tokens || 16384,
-  };
+  });
 }
 
 // ---------- Variant ID / name creation ----------
@@ -223,6 +261,8 @@ function buildVariantModel(
   return {
     id: route.syntheticId,
     name: createVariantName(fallback.name, route.providerName, route.quantization),
+    api: fallback.api,
+    baseUrl: fallback.baseUrl,
     reasoning: endpointReasoning.length > 0 ? endpointReasoning.some(Boolean) : fallback.reasoning,
     thinkingLevelMap: fallback.thinkingLevelMap,
     input: fallback.input,
@@ -252,6 +292,8 @@ function buildVariantModel(
       endpoints.map((e) => e.max_completion_tokens),
       fallback.maxTokens,
     ),
+    headers: fallback.headers,
+    compat: fallback.compat,
   };
 }
 

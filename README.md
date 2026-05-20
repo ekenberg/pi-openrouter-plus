@@ -1,6 +1,6 @@
 ![Preview](https://raw.githubusercontent.com/olixis/pi-openrouter-plus/main/assets/preview.png)
 
-# pi-openrouter-realtime v0.3.6
+# pi-openrouter-realtime v0.3.7
 
 Pi extension for OpenRouter that loads the latest models from OpenRouter in real time, with provider/quantization enrichment, endpoint health indicators, credit balance display, interactive model picker, and tab-completion.
 
@@ -9,6 +9,12 @@ Once the extension is installed and your OpenRouter credential is configured in 
 Npm package:
 
 - `pi-openrouter-realtime`
+
+## What's New in v0.3.7
+
+- **Fixed DeepSeek V4 Flash reasoning levels** — live OpenRouter sync now preserves Pi's built-in OpenRouter metadata so `deepseek/deepseek-v4-flash` exposes only `none`, `high`, and `xhigh`
+- **Preserved model compatibility metadata** — synced and enriched OpenRouter entries now keep built-in `thinkingLevelMap`, compatibility flags, base URL, API, and headers when Pi already knows the model
+- **Fixed enriched variants for special reasoning models** — provider/quantization variants inherit the base model's reasoning-level map and DeepSeek-compatible request format
 
 ## What's New in v0.3.6
 
